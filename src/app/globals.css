@@ -700,56 +700,137 @@ body {
   }
 }
 
-/* Portrait Warning Overlay styles */
-#portrait-warning {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
-  z-index: 99999;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 30px;
-  color: #f8fafc;
-}
-
-#portrait-warning h2 {
-  font-size: 1.8rem;
-  font-weight: 800;
-  margin-top: 20px;
-  margin-bottom: 10px;
-  letter-spacing: 0.05em;
-  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-#portrait-warning p {
-  font-size: 0.95rem;
-  color: #94a3b8;
-  max-width: 280px;
-  line-height: 1.5;
-}
-
-.rotation-icon {
-  font-size: 4rem;
-  animation: rotate-phone 2s ease-in-out infinite;
-}
-
-@keyframes rotate-phone {
-  0% { transform: rotate(0deg); }
-  50% { transform: rotate(-90deg); }
-  100% { transform: rotate(0deg); }
-}
-
+/* Portrait/Vertical orientation layout adjustments */
 @media (orientation: portrait) {
-  #portrait-warning {
+  #game-container {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 5vh;
+  }
+
+  #game-canvas {
+    width: 100vw;
+    height: calc(100vw * 9 / 16);
+    max-height: 40vh; /* Don't let it take too much vertical space */
+    object-fit: contain;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Position HUD on top of the canvas layout */
+  .hud-layer {
+    position: absolute;
+    top: 5vh;
+    left: 0;
+    right: 0;
+    height: calc(100vw * 9 / 16);
+    padding: 8px 12px;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* Scale HUD down slightly to fit on portrait width */
+  .hud-item {
+    transform: scale(0.85);
+    transform-origin: top center;
+    min-width: 65px;
+    padding: 4px 8px;
+  }
+
+  .hud-value {
+    font-size: 0.95rem;
+  }
+
+  .hud-label {
+    font-size: 0.55rem;
+  }
+
+  #hud-coins-container {
+    padding: 4px 10px;
+  }
+
+  .coin-icon {
+    font-size: 0.95rem;
+  }
+
+  /* Place virtual controls at the bottom half */
+  #virtual-controls {
+    position: relative;
+    margin-top: auto;
+    margin-bottom: 8vh;
+    width: 100%;
+    padding: 0 30px;
+    display: flex !important; /* Force show in portrait */
+    justify-content: space-around;
+    pointer-events: none;
+    z-index: 15;
+  }
+
+  .ctrl-btn {
+    pointer-events: auto;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.85) !important;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* Position active powerup timers below the canvas console */
+  #active-powerups {
+    position: absolute;
+    top: calc(5vh + calc(100vw * 9 / 16) + 15px);
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
+    gap: 12px;
+    z-index: 10;
+  }
+
+  .powerup-timer {
+    padding: 4px 8px;
+  }
+
+  /* Adjust overlay screens to fit narrow vertical space */
+  .overlay-screen {
+    padding: 24px;
+    justify-content: center;
+  }
+
+  .game-title {
+    font-size: 2.2rem;
+    line-height: 1.1;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .game-subtitle {
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .character-selector {
+    margin: 15px 0;
+  }
+
+  .char-options {
+    gap: 8px;
+  }
+
+  .char-btn {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  .instructions-panel {
+    display: none !important; /* Hide keys panel in portrait to prevent overflow */
+  }
+
+  /* Floating pause/mute buttons placement */
+  #floating-actions {
+    top: calc(5vh + 10px) !important;
+    right: 16px !important;
   }
 }
 

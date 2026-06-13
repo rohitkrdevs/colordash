@@ -2248,9 +2248,21 @@ export class Game {
   // Handle canvas scaling for high DPI displays and responsive styling
   resizeCanvas() {
     const dpr = Math.min(2.0, window.devicePixelRatio || 1); // Cap DPR at 2.0 to avoid GPU bottlenecks on high-density mobile screens
-    const wrapper = document.getElementById('game-wrapper');
-    const width = wrapper.clientWidth;
-    const height = wrapper.clientHeight;
+    
+    let width = this.canvas.clientWidth;
+    let height = this.canvas.clientHeight;
+    
+    // Fallback if clientWidth or clientHeight is 0 (not rendered yet)
+    if (width === 0 || height === 0) {
+      const wrapper = document.getElementById('game-wrapper');
+      if (wrapper) {
+        width = wrapper.clientWidth;
+        height = wrapper.clientHeight;
+      } else {
+        width = window.innerWidth;
+        height = window.innerHeight;
+      }
+    }
     
     this.canvas.width = width * dpr;
     this.canvas.height = height * dpr;

@@ -164,13 +164,6 @@ export default function ColorDashGame() {
           </button>
         </div>
       </div>
-
-      {/* Portrait warning overlay for mobile */}
-      <div id="portrait-warning">
-        <div className="rotation-icon">🔄</div>
-        <h2>Rotate Your Device</h2>
-        <p>Please rotate to landscape mode to play Color Dash Runner.</p>
-      </div>
     </div>
   );
 }
