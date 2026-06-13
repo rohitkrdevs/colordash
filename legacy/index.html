@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Color Dash Runner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-wrapper">
+    <div id="game-container">
+      <!-- Game Canvas -->
+      <canvas id="game-canvas" width="1280" height="720"></canvas>
+
+      <!-- Head-up Display (HUD) -->
+      <div id="hud" class="hud-layer hidden">
+        <div class="hud-left">
+          <div class="hud-item" id="hud-score-container">
+            <span class="hud-label">SCORE</span>
+            <span class="hud-value" id="hud-score">00000</span>
+          </div>
+          <div class="hud-item" id="hud-speed-container">
+            <span class="hud-label">SPEED</span>
+            <span class="hud-value" id="hud-speed">x1.0</span>
+          </div>
+        </div>
+        
+        <div class="hud-center">
+          <div class="hud-item" id="hud-coins-container">
+            <span class="coin-icon">🟡</span>
+            <span class="hud-value" id="hud-coins">0</span>
+          </div>
+        </div>
+
+        <div class="hud-right">
+          <div class="hud-item" id="hud-best-container">
+            <span class="hud-label">BEST</span>
+            <span class="hud-value" id="hud-best">00000</span>
+          </div>
+        </div>
+        
+        <!-- Power-up timers -->
+        <div id="active-powerups">
+          <div id="powerup-shield" class="powerup-timer hidden">
+            <span class="powerup-icon">🛡️</span>
+            <div class="powerup-bar-container"><div class="powerup-bar" id="shield-bar"></div></div>
+          </div>
+          <div id="powerup-magnet" class="powerup-timer hidden">
+            <span class="powerup-icon">🧲</span>
+            <div class="powerup-bar-container"><div class="powerup-bar" id="magnet-bar"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Start Screen Overlay -->
+      <div id="start-screen" class="overlay-screen">
+        <h1 class="game-title">COLOR DASH<br><span class="highlight">RUNNER</span></h1>
+        <p class="game-subtitle">Jump, duck, collect coins, and survive!</p>
+        
+        <div class="best-score-badge">
+          <span>🏆 BEST SCORE</span>
+          <strong id="start-best-score">0</strong>
+        </div>
+
+        <!-- Customizable character selector -->
+        <div class="character-selector">
+          <p>Choose Your Runner:</p>
+          <div class="char-options">
+            <button class="char-btn active" data-char="monster">👾 Monster</button>
+            <button class="char-btn" data-char="fox">🦊 Fox</button>
+            <button class="char-btn" data-char="robot">🤖 Robot</button>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button id="start-btn" class="btn btn-primary">PLAY GAME</button>
+        </div>
+
+        <div class="instructions-panel">
+          <div class="instruction-col">
+            <strong>Desktop Controls</strong>
+            <span>Space / ↑ : Jump (Double jump at 300 pts!)</span>
+            <span>↓ : Duck</span>
+            <span>P : Pause | M : Mute</span>
+          </div>
+          <div class="instruction-col">
+            <strong>Mobile Controls</strong>
+            <span>Left Side : Duck</span>
+            <span>Right Side : Jump / Double Jump</span>
+            <span>Top Controls : Pause / Sound</span>
+          </div>
+        </div>
+
+        <div class="screen-footer">
+          <button id="start-mute-btn" class="icon-btn" aria-label="Mute sound">🔊</button>
+        </div>
+      </div>
+
+      <!-- Countdown Overlay -->
+      <div id="countdown-screen" class="overlay-screen hidden">
+        <div id="countdown-number">3</div>
+      </div>
+
+      <!-- Pause Screen Overlay -->
+      <div id="pause-screen" class="overlay-screen hidden">
+        <h2>GAME PAUSED</h2>
+        <div class="btn-group-vertical">
+          <button id="resume-btn" class="btn btn-primary">RESUME</button>
+          <button id="pause-restart-btn" class="btn btn-secondary">RESTART</button>
+          <button id="pause-home-btn" class="btn btn-secondary">MAIN MENU</button>
+        </div>
+        <div class="screen-footer">
+          <button id="pause-mute-btn" class="icon-btn" aria-label="Mute sound">🔊</button>
+        </div>
+      </div>
+
+      <!-- Game Over Screen Overlay -->
+      <div id="gameover-screen" class="overlay-screen hidden">
+        <div class="gameover-container">
+          <h2 class="gameover-title">GAME OVER</h2>
+          <p id="motivational-message">So close! Try again!</p>
+          
+          <div class="new-best-alert hidden" id="new-best-badge">🎉 NEW RECORD! 🎉</div>
+
+          <div class="stats-grid">
+            <div class="stat-box">
+              <span>SCORE</span>
+              <strong id="gameover-score">0</strong>
+            </div>
+            <div class="stat-box">
+              <span>COINS</span>
+              <strong id="gameover-coins">0</strong>
+            </div>
+          </div>
+
+          <div class="btn-group-vertical">
+            <button id="restart-btn" class="btn btn-primary">PLAY AGAIN</button>
+            <button id="home-btn" class="btn btn-secondary">MAIN MENU</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top action floating buttons during playing -->
+      <div id="floating-actions" class="hidden">
+        <button id="float-pause-btn" class="icon-btn" aria-label="Pause game">⏸️</button>
+        <button id="float-mute-btn" class="icon-btn" aria-label="Toggle sound">🔊</button>
+      </div>
+
+      <!-- Mobile Virtual Touch Controls -->
+      <div id="virtual-controls" class="hidden">
+        <button id="ctrl-duck" class="ctrl-btn" aria-label="Duck">
+          <span class="ctrl-icon">▼</span>
+          <span class="ctrl-label">DUCK</span>
+        </button>
+        <button id="ctrl-jump" class="ctrl-btn" aria-label="Jump">
+          <span class="ctrl-icon">▲</span>
+          <span class="ctrl-label">JUMP</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
