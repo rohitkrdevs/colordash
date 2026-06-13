@@ -691,4 +691,65 @@ body {
   .ctrl-icon {
     font-size: 1.3rem;
   }
+
+  /* GPU optimization: remove backdrop filter blur to save CPU cycles on low-end mobile devices */
+  .hud-item, .overlay-screen, .ctrl-btn {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(15, 23, 42, 0.94) !important;
+  }
 }
+
+/* Portrait Warning Overlay styles */
+#portrait-warning {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+  z-index: 99999;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 30px;
+  color: #f8fafc;
+}
+
+#portrait-warning h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+#portrait-warning p {
+  font-size: 0.95rem;
+  color: #94a3b8;
+  max-width: 280px;
+  line-height: 1.5;
+}
+
+.rotation-icon {
+  font-size: 4rem;
+  animation: rotate-phone 2s ease-in-out infinite;
+}
+
+@keyframes rotate-phone {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(-90deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@media (orientation: portrait) {
+  #portrait-warning {
+    display: flex;
+  }
+}
+

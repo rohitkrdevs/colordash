@@ -440,6 +440,7 @@ class InputManager {
     this.keys = {};
     this.touchStartX = 0;
     this.touchStartY = 0;
+    this.activeDuckTouchId = null; // Track active touch ID for ducking
     this.onJumpCallback = null;
     this.onDuckStartCallback = null;
     this.onDuckEndCallback = null;
@@ -486,39 +487,47 @@ class InputManager {
       }
     });
 
-    // Touch Screen gestures
+    // Touch Screen gestures - Screen-Split controls
     window.addEventListener('touchstart', (e) => {
       // Don't trigger if tapping on virtual buttons or menu panels
       if (e.target.closest('button') || e.target.closest('#hud') || e.target.closest('.overlay-screen')) return;
       
-      this.touchStartX = e.touches[0].clientX;
-      this.touchStartY = e.touches[0].clientY;
+      const touch = e.changedTouches[0];
+      const isLeftHalf = touch.clientX < window.innerWidth / 2;
       
-      // Default tap triggers jump
-      if (this.onJumpCallback) {
-        this.onJumpCallback();
-      }
-    }, { passive: true });
-
-    window.addEventListener('touchmove', (e) => {
-      if (!this.touchStartX || !this.touchStartY) return;
-      
-      const deltaY = e.touches[0].clientY - this.touchStartY;
-      
-      if (deltaY < -40) { // Swiped UP
+      if (isLeftHalf) {
+        if (this.activeDuckTouchId === null) {
+          this.activeDuckTouchId = touch.identifier;
+          if (this.onDuckStartCallback) this.onDuckStartCallback();
+        }
+      } else {
         if (this.onJumpCallback) this.onJumpCallback();
-        this.touchStartY = 0; // reset
-      } else if (deltaY > 40) { // Swiped DOWN
-        if (this.onDuckStartCallback) this.onDuckStartCallback();
-        this.touchStartY = 0; // reset
       }
     }, { passive: true });
 
     window.addEventListener('touchend', (e) => {
-      this.touchStartX = 0;
-      this.touchStartY = 0;
-      if (this.onDuckEndCallback) {
-        this.onDuckEndCallback();
+      // Check if the released touch is our active ducking touch
+      if (this.activeDuckTouchId !== null) {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          if (e.changedTouches[i].identifier === this.activeDuckTouchId) {
+            this.activeDuckTouchId = null;
+            if (this.onDuckEndCallback) this.onDuckEndCallback();
+            break;
+          }
+        }
+      }
+    });
+
+    window.addEventListener('touchcancel', (e) => {
+      // Clean up ducking on touch cancel events
+      if (this.activeDuckTouchId !== null) {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          if (e.changedTouches[i].identifier === this.activeDuckTouchId) {
+            this.activeDuckTouchId = null;
+            if (this.onDuckEndCallback) this.onDuckEndCallback();
+            break;
+          }
+        }
       }
     });
 
@@ -2115,6 +2124,19 @@ export class Game {
     this.setupControlCallbacks();
     this.resizeCanvas();
     window.addEventListener('resize', () => this.resizeCanvas());
+
+    // Auto-pause game on focus loss / switching apps on mobile
+    window.addEventListener('blur', () => {
+      if (this.state === 'PLAYING') {
+        this.pauseGame();
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && this.state === 'PLAYING') {
+        this.pauseGame();
+      }
+    });
   }
 
   initUI() {
@@ -2225,7 +2247,7 @@ export class Game {
 
   // Handle canvas scaling for high DPI displays and responsive styling
   resizeCanvas() {
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(2.0, window.devicePixelRatio || 1); // Cap DPR at 2.0 to avoid GPU bottlenecks on high-density mobile screens
     const wrapper = document.getElementById('game-wrapper');
     const width = wrapper.clientWidth;
     const height = wrapper.clientHeight;
